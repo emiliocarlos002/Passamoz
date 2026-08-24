@@ -1,0 +1,21 @@
+{% extends "base.html" %}
+{% block title %}Ativar conta da operadora — PassaMoz{% endblock %}
+{% block content %}
+<div class="form-card" style="max-width:560px;margin:40px auto;">
+  {% if invalid %}
+    <h1>Link de ativação inválido</h1>
+    <p>Este link pode ter expirado, já ter sido utilizado ou a conta não estar mais elegível para ativação.</p>
+    <p>Se a operadora já foi aprovada, peça ao administrador para enviar um novo link.</p>
+    <a class="button" href="{% url 'home' %}">Voltar ao início</a>
+  {% else %}
+    <h1>Ativar conta da operadora</h1>
+    <p>Bem-vindo, <strong>{{ transporter.name }}</strong>. Defina agora uma senha segura para acessar o painel da sua operadora.</p>
+    <form method="post">
+      {% csrf_token %}
+      {{ form.as_p }}
+      <button type="submit" class="button">Ativar minha conta</button>
+    </form>
+    <p class="muted" style="margin-top:16px;">Depois da ativação, você será conectado automaticamente ao painel da operadora.</p>
+  {% endif %}
+</div>
+{% endblock %}

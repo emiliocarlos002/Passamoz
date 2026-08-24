@@ -1,0 +1,57 @@
+{% extends "base.html" %}
+{% block title %}Pagamento | PassaMoz{% endblock %}
+{% block content %}
+<div class="page-header"><span class="eyebrow">ETAPA 2 DE 3</span><h1>Pagamento da reserva</h1><p>Escolha uma forma de pagamento disponibilizada pela operadora desta viagem.</p></div>
+<div class="payment-layout">
+  <div class="form-card">
+    <div class="payment-summary">
+      <span>Viagem</span><strong>{{ booking.trip.route.origin }} → {{ booking.trip.route.destination }}</strong>
+      <span>{{ booking.trip.departure_at|date:"d/m/Y H:i" }} · Lugar {{ booking.trip_seat.seat.seat_number }}</span>
+      <b>{{ booking.amount }} {{ booking.trip.currency }}</b>
+      {% if booking.status == 'pending' and booking.expires_at %}<small class="payment-countdown" data-expires="{{ booking.expires_at|date:'c' }}">Reserva bloqueada por <strong>15 min</strong></small>{% endif %}
+    </div>
+
+    {% if booking.status == 'pending' %}
+      <h2>1. Escolha a forma de pagamento</h2>
+      <form method="post" action="{% url 'passengerpanel:submit-payment' booking.reference %}">{% csrf_token %}
+        <div class="payment-options">
+        {% for account in accounts %}
+          <label class="payment-option">
+            <input type="radio" name="provider" value="{{ account.provider }}" required>
+            <span><strong>{{ account.get_provider_display }}</strong>
+            <small>{{ account.account_name }} · {{ account.account_number }}</small>
+            {% if account.payment_instructions %}<small>{{ account.payment_instructions }}</small>{% endif %}
+            {% if account.integration_mode == "gateway" %}<small class="method-hint online">● Pagamento online pelo gateway</small>{% else %}<small class="method-hint manual">● Após pagar, informe a referência</small>{% endif %}</span>
+          </label>
+        {% empty %}<div class="empty-state"><p>A operadora ainda não configurou formas de pagamento para esta viagem.</p></div>{% endfor %}
+        </div>
+        {% if accounts %}
+        <div class="payment-fields">
+          <label class="field-label">Número da carteira <span>M-Pesa / e-Mola / mKesh</span><input type="tel" name="payer_phone" maxlength="30" placeholder="25884..." inputmode="tel"></label>
+          <label class="field-label">Referência da transação <span>Obrigatória no pagamento manual</span><input type="text" name="transaction_reference" maxlength="100" placeholder="Ex.: 123456789"></label>
+        </div>
+        <p class="muted">A confirmação só libera o bilhete quando o pagamento for validado pela operadora ou pelo gateway.</p>
+        <button class="button button-green" type="submit">Continuar para pagamento →</button>
+        {% endif %}
+      </form>
+    {% elif booking.status == 'payment_processing' %}
+      <div class="payment-status-card processing"><span>⏳</span><h2>Pagamento em processamento</h2><p>Não envie o pagamento novamente. Aguarde a confirmação.</p><a class="button button-light" href="{% url 'passengerpanel:payments' %}">Ver estado do pagamento</a></div>
+    {% elif booking.status == 'paid' %}
+      <div class="payment-status-card success"><span>✓</span><h2>Pagamento confirmado</h2><p>O seu bilhete já está disponível.</p><a class="button button-green" href="{% url 'passengerpanel:ticket-detail' booking.reference %}">Abrir bilhete e QR Code</a></div>
+    {% else %}
+      <div class="payment-status-card expired"><span>!</span><h2>Esta reserva não está mais ativa</h2><p>O lugar foi libertado. Faça uma nova pesquisa para reservar outra viagem.</p><a class="button button-green" href="{% url 'passengerpanel:search' %}">Pesquisar novamente</a></div>
+    {% endif %}
+  </div>
+  <aside class="payment-side"><div class="bus-mini">💳</div><h3>Pagamento seguro</h3><p>A PassaMoz regista a sua transação e liga-a à reserva. O bilhete só é liberado após confirmação.</p><a class="button button-light" href="{% url 'passengerpanel:payments' %}">Ver pagamentos</a></aside>
+</div>
+{% endblock %}
+{% block extra_scripts %}
+<script>
+(function(){
+  const el=document.querySelector('.payment-countdown[data-expires]'); if(!el) return;
+  const target=new Date(el.dataset.expires).getTime();
+  function tick(){const diff=target-Date.now(); if(diff<=0){el.textContent='A reserva expirou. Atualize a página.';el.classList.add('expired');return;} const m=Math.floor(diff/60000),s=Math.floor(diff/1000)%60;el.innerHTML='Tempo restante: <strong>'+String(m).padStart(2,'0')+':'+String(s).padStart(2,'0')+'</strong>';}
+  tick(); setInterval(tick,1000);
+})();
+</script>
+{% endblock %}

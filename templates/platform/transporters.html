@@ -1,0 +1,16 @@
+{% extends "base.html" %}
+{% block content %}
+<h1>Operadoras</h1>
+{% for t in transporters %}
+<div class="card">
+<h2>{{ t.name }}</h2>
+<p>{{ t.owner.email }} · {{ t.get_status_display }}</p>
+{% if t.status == "pending" %}
+<form method="post" action="{% url 'platform-transporter-approve' t.pk %}" data-confirm="Aprovar esta operadora?" class="inline action-form">{% csrf_token %}<button type="submit" class="button">Aprovar</button></form> <form method="post" action="{% url 'platform-transporter-reject' t.pk %}" data-confirm="Rejeitar esta candidatura?" class="inline action-form">{% csrf_token %}<button type="submit" class="button danger">Rejeitar</button></form>
+{% elif t.status == "active" %}
+{% if t.activation_required %}<p class="text-warning mb-2"><strong>Ativação pendente.</strong> O link de ativação ainda não foi concluído.</p><form method="post" action="{% url 'platform-transporter-resend-activation' t.pk %}" data-confirm="Enviar um novo link de ativação para esta operadora?" class="inline action-form">{% csrf_token %}<button type="submit" class="button">Reenviar ativação</button></form>{% else %}<p class="text-success mb-2">Conta ativada</p>{% endif %}
+<form method="post" action="{% url 'platform-transporter-suspend' t.pk %}" data-confirm="Suspender esta operadora? Os acessos operacionais serão afetados." class="inline action-form">{% csrf_token %}<button type="submit" class="button danger">Suspender</button></form>
+{% endif %}
+</div>
+{% empty %}<p>Nenhuma operadora.</p>{% endfor %}
+{% endblock %}

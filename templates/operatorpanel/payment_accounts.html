@@ -1,0 +1,9 @@
+{% extends "operatorpanel/base.html" %}
+{% block operator_content %}
+<div class="row g-4">
+<div class="col-xl-7"><h1 class="h4 mb-3">Contas de pagamento</h1><div class="card border-0 shadow-sm"><div class="table-responsive"><table class="table align-middle mb-0"><thead><tr><th>Operadora</th><th>Conta</th><th>Número</th><th>Estado</th><th></th></tr></thead><tbody>
+{% for account in accounts %}<tr><td>{{ account.get_provider_display }}</td><td>{{ account.account_name }}</td><td>{{ account.account_number }}</td><td>{{ account.is_active|yesno:"Ativa,Inativa" }}</td><td><form method="post" action="{% url 'operatorpanel:operator-payment-account-toggle' account.pk %}">{% csrf_token %}<button type="submit" class="btn btn-sm btn-outline-secondary">Alternar</button></form></td></tr>{% empty %}<tr><td colspan="5" class="text-center py-4 text-muted">Nenhuma conta configurada.</td></tr>{% endfor %}
+</tbody></table></div></div></div>
+<div class="col-xl-5"><div class="card border-0 shadow-sm"><div class="card-body"><h2 class="h5">Adicionar conta</h2><p class="small text-muted">Estas contas serão apresentadas ao passageiro para pagamento direto à operadora.</p><form method="post">{% csrf_token %}{{ form.as_p }}<button type="submit" class="btn btn-primary">Guardar</button></form></div></div></div>
+</div>
+{% endblock %}

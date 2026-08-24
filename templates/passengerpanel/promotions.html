@@ -1,0 +1,3 @@
+{% extends "base.html" %}
+{% block title %}Promoções | PassaMoz{% endblock %}
+{% block content %}<div class="page-header"><span class="eyebrow">OFERTAS</span><h1>Promoções</h1><p>Consulte as ofertas disponíveis. As condições são definidas pelas operadoras.</p></div><div class="grid three"><article class="card"><h2>Desconto de 15%</h2><p>Em viagens selecionadas para Nampula.</p><a class="button button-green" href="{% url 'passengerpanel:search' %}?destination=Nampula">Ver viagens</a></article><article class="card"><h2>Kids Viajam Menos</h2><p>Descontos para crianças nas rotas participantes.</p><a class="button button-green" href="{% url 'passengerpanel:search' %}">Pesquisar viagens</a></article></div>{% endblock %}

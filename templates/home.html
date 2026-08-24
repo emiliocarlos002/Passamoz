@@ -1,0 +1,76 @@
+{% extends "base.html" %}
+{% load static %}
+{% block title %}PassaMoz — Viaje com confiança{% endblock %}
+{% block content %}
+<section class="dashboard-hero">
+  <div class="hero-backdrop" aria-hidden="true"></div>
+  <div class="hero-content">
+    <span class="eyebrow white">PLATAFORMA DE PASSAGEIROS EM MOÇAMBIQUE</span>
+    <h1>Viaje com confiança.<br><em>Chegue ao seu destino.</em></h1>
+    <p>Compre a sua passagem de forma rápida, fácil e segura.</p>
+
+    <form class="hero-search" method="get" action="{% url 'trip-search' %}">
+      <label><span>⌖</span> De (Origem)<input name="origin" placeholder="Cidade ou Terminal"></label>
+      <button id="swap-locations" class="swap-btn" type="button" title="Trocar origem e destino" aria-label="Trocar origem e destino">⇄</button>
+      <label><span>⌖</span> Para (Destino)<input name="destination" placeholder="Cidade ou Terminal"></label>
+      <label><span>▣</span> Data da Viagem<input type="date" name="date"></label>
+      <label><span>♙</span> Passageiros<select name="passengers"><option>1 Passageiro</option><option>2 Passageiros</option><option>3 Passageiros</option><option>4 Passageiros</option></select></label>
+      <button class="search-btn" type="submit">⌕&nbsp; Pesquisar Viagem</button>
+    </form>
+    <div class="popular-routes"><strong>Rotas populares:</strong><a href="{% url 'trip-search' %}?origin=Maputo&destination=Beira">Maputo → Beira</a><a href="{% url 'trip-search' %}?origin=Maputo&destination=Nampula">Maputo → Nampula</a><a href="{% url 'trip-search' %}?origin=Beira&destination=Nampula">Beira → Nampula</a><a href="{% url 'trip-search' %}?origin=Maputo&destination=Tete">Maputo → Tete</a><a href="{% url 'trip-search' %}">Ver todas</a></div>
+  </div>
+  <div class="hero-art">
+    <div class="safe-badge">✓ <span><strong>100% Seguro</strong><small>Pagamento protegido</small></span></div>
+    <div class="road-scene"><img src="{% static 'images/hero-mozambique.jpg' %}" alt="Autocarro numa estrada junto ao litoral de Moçambique" loading="eager"><div class="scene-shade"></div></div>
+  </div>
+</section>
+
+<section class="trust-grid">
+  <article><span class="trust-icon green">✓</span><div><strong>Pagamento Seguro</strong><p>Pague com M-Pesa, e-Mola, cartão ou transferência.</p></div></article>
+  <article><span class="trust-icon purple">▣</span><div><strong>Bilhete Eletrónico</strong><p>Receba o seu bilhete no telemóvel. Sem filas!</p></div></article>
+  <article><span class="trust-icon blue">♙</span><div><strong>Escolha o seu Lugar</strong><p>Veja o mapa do autocarro e escolha o melhor lugar.</p></div></article>
+  <article><span class="trust-icon orange">◉</span><div><strong>Atendimento 24/7</strong><p>Estamos sempre disponíveis para ajudar você.</p></div></article>
+</section>
+
+<section class="content-section" id="destinos">
+  <div class="section-title"><div><span class="eyebrow">EXPLORE MOÇAMBIQUE</span><h2>Destinos Populares</h2></div><a href="{% url 'trip-search' %}">Ver todos →</a></div>
+  <div class="destination-grid">
+    <a class="destination-card maputo" href="{% url 'trip-search' %}?origin=Maputo"><div class="destination-photo"><img src="{% static 'images/maputo.jpg' %}" alt="Maputo" loading="lazy"></div><strong>Maputo</strong><small>120+ viagens</small><span>A partir de 350 MT</span></a>
+    <a class="destination-card beira" href="{% url 'trip-search' %}?origin=Beira"><div class="destination-photo"><img src="{% static 'images/beira.jpg' %}" alt="Beira" loading="lazy"></div><strong>Beira</strong><small>98+ viagens</small><span>A partir de 400 MT</span></a>
+    <a class="destination-card nampula" href="{% url 'trip-search' %}?origin=Nampula"><div class="destination-photo"><img src="{% static 'images/nampula.jpg' %}" alt="Nampula" loading="lazy"></div><strong>Nampula</strong><small>75+ viagens</small><span>A partir de 500 MT</span></a>
+    <a class="destination-card tete" href="{% url 'trip-search' %}?origin=Tete"><div class="destination-photo"><img src="{% static 'images/tete.jpg' %}" alt="Tete" loading="lazy"></div><strong>Tete</strong><small>60+ viagens</small><span>A partir de 450 MT</span></a>
+  </div>
+</section>
+
+<section class="lower-grid">
+  <div class="panel" id="operadoras">
+    <div class="section-title"><div><span class="eyebrow">PARCEIROS</span><h2>Empresas Parceiras</h2></div><a href="{% url 'trip-search' %}">Ver viagens →</a></div>
+    <div class="operator-chips">{% for operator in operators %}<span>🚌 <strong>{{ operator.name }}</strong><small>Operadora ativa</small></span>{% empty %}<span>🔴 <strong>Star Link</strong><small>Operadora</small></span><span>🔵 <strong>Entre Rios</strong><small>Operadora</small></span><span>🟠 <strong>Mahla Express</strong><small>Operadora</small></span><span>🟢 <strong>Lucas Tur</strong><small>Operadora</small></span>{% endfor %}</div>
+    <p class="operator-note">Os locais, horários, rotas e lugares disponíveis são definidos e organizados pelas próprias operadoras.</p>
+  </div>
+  <div class="panel promotions" id="promocoes">
+    <div class="section-title"><div><span class="eyebrow">OFERTAS</span><h2>Promoções</h2></div><a href="{% url 'trip-search' %}">Ver todas</a></div>
+    <div class="promo-item green-promo"><strong>▣ Desconto de 15%</strong><small>Em viagens para Nampula · Consulte a operadora</small></div>
+    <div class="promo-item purple-promo"><strong>♙ Kids Viajam Menos</strong><small>Condições e descontos definidos pela operadora.</small></div>
+  </div>
+</section>
+
+<section class="info-row" id="ajuda">
+  <div><span>👥</span><strong>Mais de 50.000</strong><small>Clientes satisfeitos</small></div><div><span>🚌</span><strong>Mais de 200</strong><small>Rotas disponíveis</small></div><div><span>▣</span><strong>Bilhetes digitais</strong><small>Compra sem filas</small></div><div><span>◉</span><strong>24/7</strong><small>Suporte ao cliente</small></div><div><span>★</span><strong>4.8 / 5</strong><small>Avaliação dos usuários</small></div>
+</section>
+<section class="content-section operator-cta"><div class="card"><span class="eyebrow">PARA EMPRESAS DE TRANSPORTE</span><h2>Quer vender viagens na PassaMoz?</h2><p>Crie a sua conta, envie os dados da operadora e aguarde a aprovação. Depois, configure rotas, veículos, lugares e formas de pagamento.</p><a class="button button-green" href="{% url 'transporter-apply' %}">Cadastrar minha operadora</a></div></section>
+<section class="about-card" id="sobre"><strong>Sobre a PassaMoz</strong><p>A PassaMoz conecta passageiros a operadoras de transporte em Moçambique. A plataforma facilita a pesquisa, reserva e pagamento; cada operadora mantém o controlo das suas rotas, horários, veículos e lugares.</p></section>
+<script>
+(function () {
+  const swap = document.getElementById("swap-locations");
+  if (swap) swap.addEventListener("click", function () {
+    const origin = document.querySelector('input[name="origin"]');
+    const destination = document.querySelector('input[name="destination"]');
+    if (!origin || !destination) return;
+    const value = origin.value;
+    origin.value = destination.value;
+    destination.value = value;
+  });
+})();
+</script>
+{% endblock %}

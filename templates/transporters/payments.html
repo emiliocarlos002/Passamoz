@@ -1,0 +1,7 @@
+{% extends "base.html" %}
+{% block title %}Pagamentos da operadora | PassaMoz{% endblock %}
+{% block content %}
+<div class="page-header"><span class="eyebrow">CONFIGURAÇÃO DA OPERADORA</span><h1>Formas de pagamento</h1><p>Cadastre apenas contas reais que os passageiros podem usar para pagar as viagens da sua operadora.</p></div>
+<div class="form-card"><form method="post">{% csrf_token %}{{ form.as_p }}<button type="submit" class="button button-green">Guardar forma de pagamento</button></form></div>
+{% for account in accounts %}<div class="card" style="margin-top:16px"><strong>{{ account.get_provider_display }}</strong><br><span>{{ account.account_name }} — {{ account.account_number }}</span><br><small>{% if account.integration_mode == "gateway" %}Gateway/API{% else %}Pagamento por referência{% endif %} · {% if account.is_active %}Ativo{% else %}Desativado{% endif %}</small>{% if account.payment_instructions %}<p>{{ account.payment_instructions }}</p>{% endif %}</div>{% empty %}<p>Nenhuma forma de pagamento configurada.</p>{% endfor %}
+{% endblock %}

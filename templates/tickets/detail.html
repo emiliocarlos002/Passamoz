@@ -1,0 +1,10 @@
+{% extends "base.html" %}
+{% block content %}
+<div class="form-card"><h1>Bilhete confirmado</h1>
+<p>Código: {{ ticket.code }}</p>
+<p>Operadora: {{ ticket.booking.trip.transporter.name }}</p>
+<p>Rota: {{ ticket.booking.trip.route.origin }} → {{ ticket.booking.trip.route.destination }}</p>
+<p>Lugar: {{ ticket.booking.trip_seat.seat.seat_number }}</p>
+{% if ticket.pdf %}<a class="button" href="{{ ticket.pdf.url }}">Baixar PDF</a>{% endif %}
+</div>
+{% endblock %}

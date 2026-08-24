@@ -1,0 +1,14 @@
+{% extends "base.html" %}
+{% block content %}
+<h1>Minhas viagens</h1>
+<a class="button" href="{% url 'trip-create' %}">Nova viagem</a>
+{% for trip in trips %}
+<div class="card">
+<h3>{{ trip.route.origin }} → {{ trip.route.destination }}</h3>
+<p>{{ trip.departure_at }} · {{ trip.price }} {{ trip.currency }}</p>
+{% if trip.status == "draft" %}
+<form method="post" action="{% url 'trip-publish' trip.pk %}" data-confirm="Publicar esta viagem? Ela ficará visível aos passageiros." class="inline">{% csrf_token %}<button type="submit" class="button">Publicar</button></form>
+{% else %}<span>{{ trip.get_status_display }}</span>{% endif %}
+</div>
+{% empty %}<p>Nenhuma viagem.</p>{% endfor %}
+{% endblock %}

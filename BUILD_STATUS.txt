@@ -1,0 +1,7 @@
+PassaMoz V3 verification
+
+- Python source files: compileall OK.
+- Django runtime check: not executed in this sandbox because Django is not installed and external package installation is unavailable.
+- Migration 0003 was added manually and reviewed against the model changes.
+- Final ZIP excludes __pycache__, *.pyc, db.sqlite3 and local media.
+- Production runtime should run: python manage.py migrate && python manage.py check --deploy

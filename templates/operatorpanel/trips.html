@@ -1,0 +1,8 @@
+{% extends "operatorpanel/base.html" %}
+{% block operator_content %}
+<div class="d-flex justify-content-between mb-3"><h1 class="h4">Viagens</h1><a href="{% url 'operatorpanel:operator-trip-create' %}" class="btn btn-primary">Nova viagem</a></div>
+<div class="card border-0 shadow-sm"><div class="table-responsive"><table class="table align-middle mb-0">
+<thead><tr><th>Rota</th><th>Viatura</th><th>Saída</th><th>Preço</th><th>Estado</th><th></th></tr></thead>
+<tbody>{% for trip in trips %}<tr><td>{{ trip.route.origin }} → {{ trip.route.destination }}</td><td>{{ trip.vehicle.name }}</td><td>{{ trip.departure_at|date:"d/m/Y H:i" }}</td><td>{{ trip.price }} {{ trip.currency }}</td><td>{{ trip.get_status_display }}</td><td class="text-end"><a class="btn btn-sm btn-outline-primary" href="{% url 'operatorpanel:operator-trip-edit' trip.pk %}">Editar</a>{% if trip.status != 'cancelled' and trip.status != 'finished' %}<form class="d-inline action-form" method="post" action="{% url 'operatorpanel:operator-trip-cancel' trip.pk %}" data-confirm="Cancelar esta viagem? Confirme que não existem reservas pagas.">{% csrf_token %}<button type="submit" class="btn btn-sm btn-outline-danger">Cancelar</button></form>{% endif %}</td></tr>{% empty %}<tr><td colspan="6" class="text-center py-4 text-muted">Nenhuma viagem.</td></tr>{% endfor %}</tbody>
+</table></div></div>
+{% endblock %}

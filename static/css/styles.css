@@ -1,0 +1,6 @@
+
+/* PassaMoz: ações com distância e toque confortável */
+.button, button, .btn { margin: .3rem .35rem .3rem 0; }
+.button + .button, .btn + .btn, form + form { margin-left: .35rem; }
+.payment-fields { display:grid; gap:1rem; margin:1rem 0; }
+@media (max-width: 640px) { .button, button, .btn { display:block; width:100%; margin:.55rem 0; } }

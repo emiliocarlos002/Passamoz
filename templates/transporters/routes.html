@@ -1,0 +1,6 @@
+{% extends "base.html" %}
+{% block content %}
+<h1>Rotas</h1>
+<div class="form-card"><form method="post">{% csrf_token %}{{ form.as_p }}<button type="submit" class="button">Adicionar</button></form></div>
+{% for route in routes %}<div class="card">{{ route.origin }} → {{ route.destination }}</div>{% empty %}<p>Nenhuma rota.</p>{% endfor %}
+{% endblock %}

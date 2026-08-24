@@ -1,0 +1,63 @@
+{% extends "operatorpanel/base.html" %}
+{% block operator_content %}
+<div class="d-flex justify-content-between align-items-center mb-3">
+  <div><h1 class="h4 mb-1">Reservas e pagamentos</h1><p class="text-muted mb-0">Confirme a referência recebida no M-Pesa, e-Mola ou mKesh antes de liberar o bilhete.</p></div>
+</div>
+
+<form class="row g-2 mb-3">
+  <div class="col-md-6"><input name="q" value="{{ query }}" class="form-control" placeholder="Referência, nome ou e-mail"></div>
+  <div class="col-md-3"><select name="status" class="form-select"><option value="">Todas as reservas</option><option value="pending" {% if status_filter == 'pending' %}selected{% endif %}>Pendentes</option><option value="paid" {% if status_filter == 'paid' %}selected{% endif %}>Pagas</option><option value="cancelled" {% if status_filter == 'cancelled' %}selected{% endif %}>Canceladas</option></select></div>
+  <div class="col-md-3"><button type="submit" class="btn btn-primary w-100">Filtrar</button></div>
+</form>
+
+<div class="card border-0 shadow-sm">
+<div class="table-responsive">
+<table class="table align-middle mb-0">
+<thead><tr><th>Passageiro</th><th>Viagem</th><th>Valor</th><th>Pagamento</th><th>Reserva</th><th>Ação</th></tr></thead>
+<tbody>
+{% for booking in bookings %}
+<tr>
+<td>
+  <strong>{{ booking.passenger.get_full_name|default:booking.passenger.username }}</strong><br>
+  <small class="text-muted">{{ booking.passenger.email }}</small>
+</td>
+<td>{{ booking.trip.route.origin }} → {{ booking.trip.route.destination }}<br><small>{{ booking.trip.departure_at|date:"d/m/Y H:i" }} · Lugar {{ booking.trip_seat.seat.seat_number }}</small></td>
+<td>{{ booking.amount }} {{ booking.trip.currency }}</td>
+<td>
+  {% for payment in booking.payments.all %}
+    <div class="border rounded p-2 mb-1">
+      <strong>{{ payment.provider|upper }}</strong><br>
+      <small>{{ payment.transaction_reference }}</small><br>
+      {% if payment.status == "confirmed" %}<span class="badge bg-success">Confirmado</span>
+      {% elif payment.status == "rejected" %}<span class="badge bg-danger">Rejeitado</span>
+      {% else %}<span class="badge bg-warning text-dark">Aguardando confirmação</span>{% endif %}
+      {% if payment.status == "submitted" and booking.status == "pending" %}
+      <div class="mt-2 d-flex gap-1">
+        <form method="post" action="{% url 'operatorpanel:operator-payment-confirm' payment.pk %}" data-confirm="Confirmar este pagamento? Verifique a referência e o valor antes de continuar.">{% csrf_token %}<button type="submit" class="btn btn-sm btn-success">Confirmar</button></form>
+        <form method="post" action="{% url 'operatorpanel:operator-payment-reject' payment.pk %}" data-confirm="Rejeitar este pagamento? Esta ação deve ser usada somente após conferir a referência.">{% csrf_token %}<button type="submit" class="btn btn-sm btn-outline-danger">Rejeitar</button></form>
+      </div>
+      {% endif %}
+    </div>
+  {% empty %}
+    <span class="text-muted">Sem pagamento enviado</span>
+  {% endfor %}
+</td>
+<td><span class="badge {% if booking.status == 'paid' %}bg-success{% elif booking.status == 'pending' %}bg-warning text-dark{% else %}bg-secondary{% endif %}">{{ booking.get_status_display }}</span></td>
+<td>
+  {% if booking.status == "paid" %}
+    {% if booking.ticket %}<span class="text-success">🎟️ Bilhete liberado</span>{% endif %}
+  {% elif booking.status == "pending" %}
+    <span class="text-muted">Aguardando pagamento</span>
+  {% else %}
+    <span class="text-muted">Encerrada</span>
+  {% endif %}
+</td>
+</tr>
+{% empty %}
+<tr><td colspan="6" class="text-center py-5 text-muted">Nenhuma reserva encontrada.</td></tr>
+{% endfor %}
+</tbody>
+</table>
+</div>
+</div>
+{% endblock %}

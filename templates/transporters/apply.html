@@ -1,0 +1,106 @@
+{% extends "base.html" %}
+{% block title %}Candidatura de Operadora — PassaMoz{% endblock %}
+{% block content %}
+<div class="operator-application-page">
+  <div class="operator-application-top">
+    <a class="application-back" href="{% url 'home' %}" aria-label="Voltar">←</a>
+    <div class="application-brand">
+      <div class="application-logo">🚌</div>
+      <div><strong>Passa<span>Moz</span></strong><small>Viaje melhor, viaje connosco</small></div>
+    </div>
+    <div class="application-security">🔒 Dados protegidos</div>
+  </div>
+
+  {% if request.user.is_authenticated and request.user.transporter_profile %}
+    {% with transporter=request.user.transporter_profile %}
+      <div class="form-card application-status-card">
+        {% if transporter.status == "pending" %}
+          <div class="status-icon pending">⏳</div><h1>Candidatura em análise</h1>
+          <p>A sua candidatura está <strong>aguardando aprovação</strong>. Quando for aprovada, receberá um e-mail com o link seguro para ativar a conta.</p>
+        {% elif transporter.status == "active" and transporter.activation_required %}
+          <div class="status-icon approved">✓</div><h1>Operadora aprovada</h1>
+          <p>Verifique o e-mail <strong>{{ transporter.email }}</strong> e clique no link de ativação para definir a senha do painel.</p>
+        {% elif transporter.status == "active" %}
+          <div class="status-icon approved">✓</div><h1>Conta ativa</h1>
+          <p>A sua operadora está pronta para trabalhar no PassaMoz.</p>
+          <a class="button button-green" href="{% url 'transporter-dashboard' %}">Abrir painel da operadora →</a>
+        {% else %}
+          <div class="status-icon rejected">!</div><h1>Candidatura não ativa</h1>
+          <p>Contacte o suporte PassaMoz para mais informações sobre o estado da candidatura.</p>
+        {% endif %}
+      </div>
+    {% endwith %}
+  {% else %}
+    <div class="application-hero">
+      <div>
+        <span class="eyebrow white">PASSAMOZ • PARCEIROS</span>
+        <h1>Criar conta de Operadora</h1>
+        <p>Preencha os dados da sua empresa para começar. A equipa PassaMoz irá analisar a candidatura antes de liberar o acesso.</p>
+      </div>
+      <div class="application-trust"><strong>🔐</strong><span><b>Registo seguro</b><small>Os seus dados são tratados com segurança.</small></span></div>
+    </div>
+
+    <div class="application-steps" aria-label="Etapas do cadastro">
+      <div class="application-step active"><b>1</b><span>Dados da Empresa</span></div><i></i>
+      <div class="application-step"><b>2</b><span>Localização</span></div><i></i>
+      <div class="application-step"><b>3</b><span>Contactos</span></div><i></i>
+      <div class="application-step"><b>4</b><span>Documentos</span></div><i></i>
+      <div class="application-step"><b>5</b><span>Confirmação</span></div>
+    </div>
+
+    <form method="post" class="operator-application-form" novalidate>
+      {% csrf_token %}
+      {% if form.non_field_errors %}<div class="message message-error">{{ form.non_field_errors }}</div>{% endif %}
+
+      <section class="application-section">
+        <div class="application-section-title"><span class="section-icon">▦</span><div><h2>Dados da Empresa</h2><p>Informações oficiais da operadora.</p></div></div>
+        <div class="application-grid two">
+          {% include "transporters/_application_field.html" with field=form.name wide=True %}
+          {% include "transporters/_application_field.html" with field=form.legal_name wide=True %}
+          {% include "transporters/_application_field.html" with field=form.registration_number %}
+          {% include "transporters/_application_field.html" with field=form.company_type %}
+          {% include "transporters/_application_field.html" with field=form.founded_year %}
+          {% include "transporters/_application_field.html" with field=form.fleet_size %}
+        </div>
+      </section>
+
+      <section class="application-section">
+        <div class="application-section-title"><span class="section-icon">⌖</span><div><h2>Localização</h2><p>Onde a sua empresa está localizada?</p></div></div>
+        <div class="application-grid two">
+          {% include "transporters/_application_field.html" with field=form.province %}
+          {% include "transporters/_application_field.html" with field=form.city %}
+          {% include "transporters/_application_field.html" with field=form.address wide=True %}
+          {% include "transporters/_application_field.html" with field=form.main_terminal wide=True %}
+        </div>
+      </section>
+
+      <section class="application-section">
+        <div class="application-section-title"><span class="section-icon">♙</span><div><h2>Responsável pela empresa</h2><p>Informações da pessoa responsável pela candidatura.</p></div></div>
+        <div class="application-grid two">
+          {% include "transporters/_application_field.html" with field=form.responsible_name %}
+          {% include "transporters/_application_field.html" with field=form.responsible_role %}
+          {% include "transporters/_application_field.html" with field=form.phone %}
+          {% include "transporters/_application_field.html" with field=form.whatsapp %}
+          {% include "transporters/_application_field.html" with field=form.email wide=True %}
+          {% include "transporters/_application_field.html" with field=form.website wide=True %}
+        </div>
+      </section>
+
+      <section class="application-section">
+        <div class="application-section-title"><span class="section-icon">🚌</span><div><h2>Dados de transporte</h2><p>Conte-nos um pouco sobre a operação da empresa.</p></div></div>
+        <div class="application-grid two">
+          {% include "transporters/_application_field.html" with field=form.vehicle_types wide=True %}
+          {% include "transporters/_application_field.html" with field=form.operating_provinces wide=True %}
+        </div>
+        <div class="application-document-note"><strong>📄 Documentos</strong><span>Após o envio, a equipa PassaMoz poderá solicitar alvará, NUIT, registo da empresa e outros documentos para validação.</span></div>
+      </section>
+
+      <div class="application-submit-area">
+        <label class="application-consent"><input type="checkbox" required> <span>Declaro que as informações fornecidas são verdadeiras e aceito os Termos e a Política de Privacidade do PassaMoz.</span></label>
+        <button type="submit" class="button application-submit">Enviar candidatura <span>→</span></button>
+        <small>Depois do envio, a candidatura será analisada. Você receberá um e-mail quando houver uma decisão.</small>
+      </div>
+    </form>
+  {% endif %}
+</div>
+{% endblock %}

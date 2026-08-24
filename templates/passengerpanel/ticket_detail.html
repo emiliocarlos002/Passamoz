@@ -1,0 +1,21 @@
+{% extends "passengerpanel/base.html" %}
+{% block passenger_content %}
+<div class="row justify-content-center"><div class="col-lg-7">
+<div class="card border-0 shadow-sm text-center"><div class="card-body p-4">
+<span class="badge bg-success mb-2">BILHETE CONFIRMADO</span>
+<h1 class="h3">PassaMoz</h1>
+<h2 class="h5">{{ booking.trip.route.origin }} → {{ booking.trip.route.destination }}</h2>
+<p>{{ booking.trip.transporter.name }}</p>
+<div class="bg-light rounded p-3 text-start my-3">
+<p><strong>Passageiro:</strong> {{ booking.passenger.get_full_name|default:booking.passenger.username }}</p>
+<p><strong>Partida:</strong> {{ booking.trip.departure_at|date:"d/m/Y H:i" }}</p>
+<p><strong>Lugar:</strong> {{ booking.trip_seat.seat.seat_number }}</p>
+<p><strong>Valor:</strong> {{ booking.amount }} {{ booking.trip.currency }}</p>
+<p class="mb-0"><strong>Código:</strong> {{ ticket.code }}</p>
+</div>
+<div class="border rounded p-4 my-3"><div id="ticket-qr" class="d-flex justify-content-center" data-code="{{ ticket.code }}"></div><p class="small text-muted mt-2 mb-0">Apresente este QR Code no embarque.</p></div>
+<a class="btn btn-primary" href="{% url 'passengerpanel:ticket-pdf' booking.reference %}">Baixar PDF</a>
+</div></div></div></div>
+<script src="https://cdn.jsdelivr.net/npm/qrcodejs@1.0.0/qrcode.min.js"></script>
+<script>new QRCode(document.getElementById("ticket-qr"), {text: document.getElementById("ticket-qr").dataset.code, width: 220, height: 220});</script>
+{% endblock %}

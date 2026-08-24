@@ -1,0 +1,8 @@
+{% extends "operatorpanel/base.html" %}
+{% block operator_content %}
+<div class="d-flex justify-content-between mb-3"><h1 class="h4">Rotas</h1><a href="{% url 'operatorpanel:operator-route-create' %}" class="btn btn-primary">Nova rota</a></div>
+<div class="card border-0 shadow-sm"><div class="table-responsive"><table class="table align-middle mb-0">
+<thead><tr><th>Origem</th><th>Destino</th><th>Estado</th><th></th></tr></thead>
+<tbody>{% for route in routes %}<tr><td>{{ route.origin }}</td><td>{{ route.destination }}</td><td>{{ route.active|yesno:"Ativa,Inativa" }}</td><td class="text-end"><a class="btn btn-sm btn-outline-primary" href="{% url 'operatorpanel:operator-route-edit' route.pk %}">Editar</a>{% if route.active %}<form class="d-inline action-form" method="post" action="{% url 'operatorpanel:operator-route-delete' route.pk %}" data-confirm="Desativar esta rota? Ela deixará de aparecer como ativa.">{% csrf_token %}<button type="submit" class="btn btn-sm btn-outline-danger">Desativar</button></form>{% endif %}</td></tr>{% empty %}<tr><td colspan="4" class="text-center py-4 text-muted">Nenhuma rota.</td></tr>{% endfor %}</tbody>
+</table></div></div>
+{% endblock %}

@@ -1,0 +1,23 @@
+{% extends "passengerpanel/base.html" %}
+{% block title %}Passageiro | PassaMoz{% endblock %}
+{% block passenger_content %}
+<div class="p-4 p-md-5 mb-4 rounded-4 bg-dark text-white">
+  <h1 class="display-6 fw-bold">Viaje com PassaMoz</h1>
+  <p class="lead">Pesquise viagens, reserve o seu lugar e receba o bilhete com QR Code.</p>
+  <a href="{% url 'passengerpanel:search' %}" class="btn btn-success">Pesquisar viagens</a>
+</div>
+<div class="row g-3 mb-4">
+  <div class="col-md-6"><div class="card border-0 shadow-sm"><div class="card-body"><small class="text-muted">Bilhetes pagos</small><div class="h2">{{ paid_count }}</div></div></div></div>
+  <div class="col-md-6"><div class="card border-0 shadow-sm"><div class="card-body"><small class="text-muted">Reservas pendentes</small><div class="h2">{{ pending_count }}</div></div></div></div>
+</div>
+<h2 class="h4 mb-3">Últimas reservas</h2>
+<div class="card border-0 shadow-sm"><div class="table-responsive"><table class="table align-middle mb-0">
+<thead><tr><th>Rota</th><th>Saída</th><th>Lugar</th><th>Estado</th><th></th></tr></thead>
+<tbody>{% for booking in bookings %}<tr>
+<td>{{ booking.trip.route.origin }} → {{ booking.trip.route.destination }}</td>
+<td>{{ booking.trip.departure_at|date:"d/m/Y H:i" }}</td>
+<td>{{ booking.trip_seat.seat.seat_number }}</td><td>{{ booking.get_status_display }}</td>
+<td>{% if booking.status == 'paid' %}<a class="btn btn-sm btn-success" href="{% url 'passengerpanel:ticket-detail' booking.reference %}">Bilhete</a>{% elif booking.status == 'pending' %}<a class="btn btn-sm btn-primary" href="{% url 'passengerpanel:payment' booking.reference %}">Pagar</a>{% endif %}</td>
+</tr>{% empty %}<tr><td colspan="5" class="text-center py-4 text-muted">Ainda não tem reservas.</td></tr>{% endfor %}</tbody>
+</table></div></div>
+{% endblock %}

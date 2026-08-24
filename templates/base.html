@@ -1,0 +1,149 @@
+{% load static %}
+<!doctype html>
+<html lang="pt-MZ">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <meta name="theme-color" content="#0b4ea2">
+  <meta name="description" content="PassaMoz — plataforma de viagens e bilhetes em Moçambique.">
+  <title>{% block title %}PassaMoz — Viaje com confiança{% endblock %}</title>
+  <link rel="preconnect" href="https://cdn.jsdelivr.net">
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet" crossorigin="anonymous">
+  <link rel="stylesheet" href="{% static 'css/app.css' %}">
+  {% block extra_head %}{% endblock %}
+</head>
+<body>
+  <div class="mobile-scrim" id="mobile-scrim" aria-hidden="true"></div>
+  <div class="app-shell">
+    <aside class="sidebar" id="sidebar">
+      <a class="sidebar-brand" href="{% url 'home' %}">
+        <span class="sidebar-logo"><img src="{% static 'images/passamoz-opcao1.png' %}" alt="PassaMoz"></span>
+        <span><strong>Passa<span>Moz</span></strong><small>Viaje com confiança.</small></span>
+      </a>
+
+      <nav class="sidebar-nav" aria-label="Navegação principal">
+        <a class="side-item side-primary" data-nav="search" href="{% url 'trip-search' %}"><span>⌕</span><span class="side-label">Pesquisar Viagem</span></a>
+        {% if user.is_authenticated %}
+          <a class="side-item" data-nav="trips" href="{% url 'passengerpanel:my-trips' %}"><span>◷</span><span class="side-label">Minhas Viagens</span></a>
+          <a class="side-item" data-nav="tickets" href="{% url 'passengerpanel:my-tickets' %}"><span>▣</span><span class="side-label">Meus Bilhetes</span></a>
+          <a class="side-item" data-nav="payments" href="{% url 'passengerpanel:payments' %}"><span>▤</span><span class="side-label">Pagamentos</span></a>
+        {% else %}
+          <a class="side-item" href="{% url 'login' %}?next={% url 'passengerpanel:my-trips' %}"><span>◷</span><span class="side-label">Minhas Viagens</span></a>
+          <a class="side-item" href="{% url 'login' %}?next={% url 'passengerpanel:my-tickets' %}"><span>▣</span><span class="side-label">Meus Bilhetes</span></a>
+          <a class="side-item" href="{% url 'login' %}?next={% url 'passengerpanel:payments' %}"><span>▤</span><span class="side-label">Pagamentos</span></a>
+        {% endif %}
+        <a class="side-item" data-nav="favorites" href="{% if user.is_authenticated %}{% url 'passengerpanel:favorites' %}{% else %}{% url 'login' %}?next={% url 'passengerpanel:favorites' %}{% endif %}"><span>♡</span><span class="side-label">Favoritos</span></a>
+        <div class="side-divider"></div>
+        <a class="side-item side-promo" data-nav="promotions" href="{% url 'passengerpanel:promotions' %}"><span>✦</span><span class="side-label">Promoções</span><b>Novo</b></a>
+        {% if user.is_authenticated %}<a class="side-item" data-nav="settings" href="{% url 'account-settings' %}"><span>⚙</span><span class="side-label">Definições</span></a>{% else %}<a class="side-item" href="{% url 'login' %}"><span>⚙</span><span class="side-label">Definições</span></a>{% endif %}
+        <a class="side-item" data-nav="help" href="{% url 'passengerpanel:help' %}"><span>?</span><span class="side-label">Ajuda &amp; Suporte</span></a>
+        <a class="side-item" data-nav="about" href="{% url 'passengerpanel:about' %}"><span>ⓘ</span><span class="side-label">Sobre a PassaMoz</span></a>
+        <a class="side-item side-operator" href="{% url 'transporter-apply' %}"><span>🚌</span><span class="side-label">Sou uma operadora</span></a>
+      </nav>
+
+      <div class="sidebar-bottom">
+        <div class="side-slogan">Viaje tranquilo.<br><strong>Viaje seguro.</strong><br><span>Viaje PassaMoz.</span></div>
+        <a class="support-card" href="{% url 'passengerpanel:help' %}"><span class="support-icon">◉</span><span><strong>Atendimento 24/7</strong><small>Estamos disponíveis para ajudar você.</small></span></a>
+      </div>
+    </aside>
+
+    <div class="main-area">
+      <header class="topbar">
+        <button class="menu-toggle" type="button" id="menu-toggle" aria-label="Abrir menu" aria-controls="sidebar" aria-expanded="false">☰</button>
+        <a class="mobile-brand" href="{% url 'home' %}">Passa<span>Moz</span></a>
+        <div class="topbar-copy">A sua plataforma de viagens em <strong>Moçambique.</strong></div>
+        <div class="topbar-actions">
+          <button id="theme-toggle" class="icon-btn" type="button" title="Ativar modo escuro" aria-label="Ativar modo escuro">☾</button>
+          <a class="icon-btn notification" href="{% url 'notifications:list' %}" title="Notificações" aria-label="Notificações">
+            ♧{% if user.is_authenticated and passamoz_unread_count %}<i>{{ passamoz_unread_count }}</i>{% endif %}
+          </a>
+          {% if user.is_authenticated %}
+            <a class="profile-pill" href="{% url 'account-settings' %}"><span>●</span><span class="profile-name">Olá, {{ user.first_name|default:user.username }}</span><b>⌄</b></a>
+          {% else %}
+            <a class="profile-pill" href="{% url 'login' %}"><span>●</span><span class="profile-name">Entrar</span><b>⌄</b></a>
+          {% endif %}
+        </div>
+      </header>
+
+      <main class="container">
+        {% for message in messages %}
+          <div class="message message-{{ message.tags|default:'info' }}" role="status"><span>{{ message }}</span><button type="button" class="message-close" aria-label="Fechar">×</button></div>
+        {% endfor %}
+        {% block content %}{% endblock %}
+      </main>
+      <footer class="footer"><strong>PassaMoz</strong> · Sua viagem. Seu bilhete. Seu destino. · Moçambique</footer>
+    </div>
+  </div>
+<script>
+(function () {
+  const key = "passamoz-theme";
+  const body = document.body;
+  const btn = document.getElementById("theme-toggle");
+  const saved = localStorage.getItem(key);
+  if (saved === "dark") body.classList.add("dark-mode");
+  function syncThemeButton() {
+    if (!btn) return;
+    const dark = body.classList.contains("dark-mode");
+    btn.textContent = dark ? "☀" : "☾";
+    btn.title = dark ? "Ativar modo claro" : "Ativar modo escuro";
+    btn.setAttribute("aria-label", btn.title);
+  }
+  syncThemeButton();
+  if (btn) btn.addEventListener("click", function () {
+    body.classList.toggle("dark-mode");
+    localStorage.setItem(key, body.classList.contains("dark-mode") ? "dark" : "light");
+    syncThemeButton();
+  });
+
+  const sidebar = document.getElementById('sidebar');
+  const scrim = document.getElementById('mobile-scrim');
+  const menu = document.getElementById('menu-toggle');
+  function closeMenu(){ sidebar?.classList.remove('open'); scrim?.classList.remove('show'); menu?.setAttribute('aria-expanded','false'); }
+  menu?.addEventListener('click', function(){
+    const open = sidebar?.classList.toggle('open');
+    scrim?.classList.toggle('show', open);
+    menu.setAttribute('aria-expanded', String(!!open));
+  });
+  scrim?.addEventListener('click', closeMenu);
+  document.querySelectorAll('.sidebar-nav a').forEach(function(link){ link.addEventListener('click', closeMenu); });
+
+  // Highlight the section that is currently open.
+  const path = window.location.pathname;
+  document.querySelectorAll('.side-item[data-nav]').forEach(function(link){
+    const href = link.getAttribute('href') || '';
+    if (href && href !== '/' && path.startsWith(new URL(href, window.location.origin).pathname)) link.classList.add('is-active');
+  });
+
+  // Professional action feedback and confirmation for destructive actions.
+  document.querySelectorAll('form[data-confirm]').forEach(function(form){
+    form.addEventListener('submit', function(e){
+      if (!window.confirm(form.dataset.confirm)) e.preventDefault();
+    });
+  });
+  document.querySelectorAll('form').forEach(function(form){
+    form.addEventListener('submit', function(){
+      const submit = form.querySelector('button[type="submit"]:not([data-no-loading])');
+      if (!submit || form.dataset.noLoading === 'true') return;
+      submit.disabled = true;
+      submit.classList.add('is-loading');
+      submit.dataset.originalText = submit.innerHTML;
+      submit.innerHTML = '<span class="button-spinner" aria-hidden="true"></span>A processar...';
+    });
+  });
+  document.querySelectorAll('.message-close').forEach(function(btn){ btn.addEventListener('click', function(){ btn.closest('.message')?.remove(); }); });
+
+  // Origin/destination swap on the main search form.
+  const swap = document.getElementById('swap-locations');
+  swap?.addEventListener('click', function(){
+    const form = swap.closest('form');
+    const origin = form?.querySelector('[name="origin"]');
+    const destination = form?.querySelector('[name="destination"]');
+    if (!origin || !destination) return;
+    const value = origin.value; origin.value = destination.value; destination.value = value;
+    origin.focus();
+  });
+})();
+</script>
+{% block extra_scripts %}{% endblock %}
+</body>
+</html>

@@ -1,0 +1,24 @@
+{% extends "base.html" %}
+{% block content %}
+<section class="operator-workspace">
+  <div class="operator-header">
+    <div>
+      <span class="eyebrow">PAINEL DA OPERADORA</span>
+      <h1>{{ operator.name|default:'A sua operadora' }}</h1>
+      <p>Gerencie viagens, viaturas, reservas e pagamentos num só lugar.</p>
+    </div>
+    <span class="status-pill success"><i></i> Operadora ativa</span>
+  </div>
+  <nav class="operator-nav" aria-label="Navegação da operadora">
+    <a href="{% url 'operatorpanel:operator-dashboard' %}">📊 <span>Dashboard</span></a>
+    <a href="{% url 'operatorpanel:operator-trip-list' %}">🚌 <span>Viagens</span></a>
+    <a href="{% url 'operatorpanel:operator-route-list' %}">🗺️ <span>Rotas</span></a>
+    <a href="{% url 'operatorpanel:operator-vehicle-list' %}">🚐 <span>Viaturas</span></a>
+    <a href="{% url 'operatorpanel:operator-booking-list' %}">🎫 <span>Reservas</span></a>
+    <a href="{% url 'qrvalidation:scanner' %}">📷 <span>Validar QR</span></a>
+    <a href="{% url 'operatorpanel:operator-payment-accounts' %}">💳 <span>Pagamentos</span></a>
+    <a href="{% url 'operatorpanel:operator-subscriptions' %}">💰 <span>Mensalidades</span></a>
+  </nav>
+  {% block operator_content %}{% endblock %}
+</section>
+{% endblock %}

@@ -1,0 +1,121 @@
+{% extends "base.html" %}
+{% block title %}Painel Administrativo | PassaMoz{% endblock %}
+{% block content %}
+<div class="container py-4">
+  <div class="d-flex flex-wrap justify-content-between align-items-center gap-3 mb-4">
+    <div>
+      <span class="badge bg-success mb-2">ADMINISTRADOR</span>
+      <h1 class="h3 mb-1">Painel PassaMoz</h1>
+      <p class="text-muted mb-0">Gestão da plataforma de bilhetes.</p>
+    </div>
+    <a class="btn btn-outline-primary" href="{% url 'admin:index' %}">Administração avançada</a>
+  </div>
+
+  <div class="row g-3 mb-4">
+    {% for label,value,detail in stats %}
+    <div class="col-6 col-xl-3">
+      <div class="card h-100 border-0 shadow-sm">
+        <div class="card-body">
+          <div class="small text-muted">{{ label }}</div>
+          <div class="display-6 fw-bold">{{ value }}</div>
+          <div class="small text-muted">{{ detail }}</div>
+        </div>
+      </div>
+    </div>
+    {% endfor %}
+  </div>
+
+  <div class="quick-actions mb-4">
+  <a href="{% url 'platform-transporters' %}"><span>🏢</span><strong>Operadoras</strong><small>Aprovar e suspender</small></a>
+  <a href="{% url 'platform-subscriptions' %}"><span>💰</span><strong>Mensalidades</strong><small>Ver pagamentos</small></a>
+  <a href="{% url 'admin:index' %}"><span>⚙️</span><strong>Admin Django</strong><small>Configuração avançada</small></a>
+</div>
+
+<div class="row g-4">
+    <div class="col-xl-7">
+      <div class="card border-0 shadow-sm">
+        <div class="card-header bg-white d-flex justify-content-between">
+          <strong>Operadoras</strong>
+          <span class="badge bg-warning text-dark">{{ pending_operators }} pendentes</span>
+        </div>
+        <div class="table-responsive">
+          <table class="table table-hover align-middle mb-0">
+            <thead><tr><th>Operadora</th><th>Estado</th><th>Viagens</th><th>Bilhetes</th></tr></thead>
+            <tbody>
+            {% for operator in operators %}
+              <tr>
+                <td><strong>{{ operator.name }}</strong></td>
+                <td>{{ operator.status }}</td>
+                <td>{{ operator.trip_count }}</td>
+                <td>{{ operator.ticket_count }}</td>
+              </tr>
+            {% empty %}
+              <tr><td colspan="4" class="text-center text-muted py-4">Nenhuma operadora.</td></tr>
+            {% endfor %}
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+    <div class="col-xl-5">
+      <div class="card border-0 shadow-sm h-100">
+        <div class="card-header bg-white"><strong>Mensalidades</strong></div>
+        <div class="card-body">
+          <div class="row g-3 mb-3">
+            <div class="col-6"><div class="p-3 bg-light rounded">
+              <div class="small text-muted">Recebido</div><div class="h4 mb-0">{{ monthly_paid }}</div>
+            </div></div>
+            <div class="col-6"><div class="p-3 bg-light rounded">
+              <div class="small text-muted">Pendente</div><div class="h4 mb-0">{{ monthly_pending }}</div>
+            </div></div>
+          </div>
+          {% for payment in memberships %}
+          <div class="d-flex justify-content-between border-bottom py-2">
+            <span>{{ payment.operator_name }}<br><small>{{ payment.month }}</small></span>
+            <span class="text-end"><strong>{{ payment.amount }}</strong><br>{{ payment.status }}</span>
+          </div>
+          {% empty %}
+          <p class="text-muted mb-0">Nenhuma mensalidade registrada.</p>
+          {% endfor %}
+        </div>
+      </div>
+    </div>
+
+    <div class="col-xl-8">
+      <div class="card border-0 shadow-sm">
+        <div class="card-header bg-white"><strong>Próximas viagens</strong></div>
+        <div class="table-responsive">
+          <table class="table table-hover align-middle mb-0">
+            <thead><tr><th>Rota</th><th>Operadora</th><th>Saída</th><th>Preço</th></tr></thead>
+            <tbody>
+            {% for trip in trips %}
+              <tr>
+                <td>{{ trip.route.origin }} → {{ trip.route.destination }}</td>
+                <td>{{ trip.transporter.name }}</td>
+                <td>{{ trip.departure_at|date:"d/m/Y H:i" }}</td>
+                <td>{{ trip.price }} {{ trip.currency }}</td>
+              </tr>
+            {% empty %}
+              <tr><td colspan="4" class="text-center text-muted py-4">Nenhuma viagem.</td></tr>
+            {% endfor %}
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+    <div class="col-xl-4">
+      <div class="card border-0 shadow-sm h-100">
+        <div class="card-header bg-white"><strong>Bilhetes e reservas</strong></div>
+        <div class="card-body">
+          <div class="d-flex justify-content-between border-bottom py-2"><span>Bilhetes emitidos</span><strong>{{ ticket_count }}</strong></div>
+          <div class="d-flex justify-content-between border-bottom py-2"><span>Reservas pagas</span><strong>{{ paid_bookings }}</strong></div>
+          <div class="d-flex justify-content-between border-bottom py-2"><span>Reservas pendentes</span><strong>{{ pending_bookings }}</strong></div>
+          <div class="d-flex justify-content-between py-2"><span>Passageiros</span><strong>{{ passenger_count }}</strong></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}

@@ -1,0 +1,10 @@
+{% extends "base.html" %}
+{% block content %}
+<h1>{{ transporter.name }}</h1>
+<div class="grid">
+<a class="card" href="{% url 'transporter-routes' %}">Rotas</a>
+<a class="card" href="{% url 'transporter-vehicles' %}">Veículos</a>
+<a class="card" href="{% url 'trip-list' %}">Viagens</a>
+<a class="card" href="{% url 'transporter-payments' %}">Contas de pagamento</a>
+</div>
+{% endblock %}

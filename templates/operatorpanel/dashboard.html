@@ -1,0 +1,40 @@
+{% extends "operatorpanel/base.html" %}
+{% block title %}Operadora | PassaMoz{% endblock %}
+{% block operator_content %}
+<div class="d-flex justify-content-between align-items-center mb-4">
+  <div><h1 class="h3">Painel da Operadora</h1><p class="text-muted mb-0">Gestão de viagens, reservas e pagamentos.</p></div>
+  <span class="badge bg-success">ATIVA</span>
+</div>
+<div class="row g-3 mb-4">
+{% for label,value,detail in stats %}
+<div class="col-6 col-xl-3"><div class="card border-0 shadow-sm h-100"><div class="card-body">
+<div class="small text-muted">{{ label }}</div><div class="h3 fw-bold">{{ value }}</div><div class="small text-muted">{{ detail }}</div>
+</div></div></div>
+{% endfor %}
+</div>
+<div class="row g-4">
+  <div class="col-xl-8">
+    <div class="card border-0 shadow-sm">
+      <div class="card-header bg-white d-flex justify-content-between"><strong>Próximas viagens</strong><a href="{% url 'operatorpanel:operator-trip-create' %}" class="btn btn-sm btn-primary">Nova viagem</a></div>
+      <div class="table-responsive"><table class="table align-middle mb-0">
+      <thead><tr><th>Rota</th><th>Viatura</th><th>Saída</th><th>Preço</th></tr></thead>
+      <tbody>{% for trip in upcoming %}<tr>
+        <td>{{ trip.route.origin }} → {{ trip.route.destination }}</td><td>{{ trip.vehicle.name }}</td>
+        <td>{{ trip.departure_at|date:"d/m/Y H:i" }}</td><td>{{ trip.price }} {{ trip.currency }}</td>
+      </tr>{% empty %}<tr><td colspan="4" class="text-center text-muted py-4">Nenhuma viagem próxima.</td></tr>{% endfor %}</tbody>
+      </table></div>
+    </div>
+  </div>
+  <div class="col-xl-4">
+    <div class="card border-0 shadow-sm">
+      <div class="card-header bg-white"><strong>Situação</strong></div>
+      <div class="card-body">
+        <div class="d-flex justify-content-between py-2 border-bottom"><span>Reservas pendentes</span><strong>{{ pending_bookings }}</strong></div>
+        <div class="d-flex justify-content-between py-2 border-bottom"><span>Lugares disponíveis</span><strong>{{ available_seats }}</strong></div>
+        <div class="d-flex justify-content-between py-2 border-bottom"><span>Rotas ativas</span><strong>{{ routes }}</strong></div>
+        <div class="d-flex justify-content-between py-2"><span>Viaturas ativas</span><strong>{{ vehicles }}</strong></div>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}

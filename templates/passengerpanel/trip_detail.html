@@ -1,0 +1,18 @@
+{% extends "base.html" %}
+{% block title %}Escolher lugar | PassaMoz{% endblock %}
+{% block content %}
+<div class="page-header"><span class="eyebrow">ETAPA 1 DE 3</span><h1>{{ trip.route.origin }} → {{ trip.route.destination }}</h1><p>{{ trip.transporter.name }} · {{ trip.departure_at|date:"d/m/Y H:i" }} · {{ trip.vehicle.name }}</p></div>
+<div class="trip-layout">
+<div class="form-card"><div class="action-row action-actions mb-3"><a class="button button-light" href="{% url 'passengerpanel:search' %}">← Voltar à pesquisa</a>{% if user.is_authenticated %}<form method="post" action="{% url 'passengerpanel:toggle-favorite' trip.pk %}">{% csrf_token %}<button class="button button-light" type="submit">{% if is_favorite %}♥ Remover dos favoritos{% else %}♡ Adicionar aos favoritos{% endif %}</button></form>{% endif %}</div>
+<div class="trip-summary"><div><span>Partida</span><strong>{{ trip.departure_at|date:"d/m/Y H:i" }}</strong></div><div><span>Chegada</span><strong>{{ trip.arrival_at|date:"d/m/Y H:i"|default:"Não informada" }}</strong></div><div><span>Preço</span><strong>{{ trip.price }} {{ trip.currency }}</strong></div></div>
+<h2>Escolha o seu lugar no ônibus</h2>
+{% if user.is_authenticated %}
+<form method="post" action="{% url 'passengerpanel:create-booking' trip.pk %}">{% csrf_token %}
+<div class="bus-layout"><div class="bus-front">🚍 FRENTE</div><div class="bus-seats">{% for seat in seats %}<label class="bus-seat"><input required type="radio" name="seat_id" value="{{ seat.pk }}"><span>{{ seat.seat.seat_number }}</span></label>{% empty %}<p>Sem lugares disponíveis.</p>{% endfor %}</div><div class="bus-back">SAÍDA</div></div>
+<div class="seat-legend"><span><i class="seat-demo available"></i>Disponível</span><span><i class="seat-demo selected"></i>Selecionado</span></div>
+<button type="submit" class="button button-green" {% if not seats %}disabled{% endif %}>Reservar lugar e continuar para pagamento →</button>
+</form>
+{% else %}<p>Entre na sua conta para reservar.</p><a class="button button-green" href="{% url 'login' %}?next={% url 'passengerpanel:trip-detail' trip.pk %}">Entrar para reservar</a>{% endif %}</div>
+<aside class="payment-side"><h2>Pagamento seguro</h2><p>Depois de reservar, você verá apenas as formas de pagamento desta operadora.</p>{% for account in payment_accounts %}<div class="payment-account"><strong>{{ account.get_provider_display }}</strong><span>{{ account.account_number }}</span></div>{% empty %}<p>Nenhuma conta configurada.</p>{% endfor %}</aside>
+</div>
+{% endblock %}

@@ -1,0 +1,107 @@
+{% extends "base.html" %}
+{% block title %}Validação de Bilhetes | PassaMoz{% endblock %}
+{% block content %}
+<div class="container py-4">
+  <div class="d-flex justify-content-between align-items-center mb-4">
+    <div>
+      <span class="badge bg-success">OPERADORA</span>
+      <h1 class="h3 mb-1">Validação de Bilhetes</h1>
+      <p class="text-muted mb-0">{{ operator.name }} · confira o QR Code antes do embarque.</p>
+    </div>
+    <a href="{% url 'operatorpanel:operator-dashboard' %}" class="btn btn-outline-secondary">Voltar ao painel</a>
+  </div>
+
+  <div class="row justify-content-center">
+    <div class="col-lg-7">
+      <div class="card border-0 shadow-sm">
+        <div class="card-body text-center p-4">
+          <div id="reader" style="max-width: 480px; margin: auto;"></div>
+          <div class="mt-3">
+            <button id="start" class="btn btn-primary">Iniciar câmera</button>
+            <button id="stop" class="btn btn-outline-secondary d-none">Parar câmera</button>
+          </div>
+          <div id="result" class="mt-4" aria-live="polite"></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script src="https://unpkg.com/html5-qrcode" type="text/javascript"></script>
+<script>
+const result = document.getElementById("result");
+const startButton = document.getElementById("start");
+const stopButton = document.getElementById("stop");
+let scanner = null;
+let locked = false;
+
+function showResult(data) {
+  const klass = data.valid ? "alert-success" : "alert-danger";
+  result.innerHTML = `
+    <div class="alert ${klass} text-start">
+      <h2 class="h5">${data.valid ? "✓ BILHETE VÁLIDO" : "✕ BILHETE NÃO VÁLIDO"}</h2>
+      <p class="mb-2">${data.message}</p>
+      ${data.valid ? `
+        <hr>
+        <strong>Passageiro:</strong> ${data.passenger}<br>
+        <strong>Rota:</strong> ${data.route}<br>
+        <strong>Partida:</strong> ${data.departure}<br>
+        <strong>Lugar:</strong> ${data.seat}<br>
+        <strong>Valor:</strong> ${data.amount} ${data.currency}
+      ` : ""}
+    </div>`;
+}
+
+async function validateCode(code) {
+  const response = await fetch("{% url 'qrvalidation:validate' %}", {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+      "X-CSRFToken": "{{ csrf_token }}"
+    },
+    body: JSON.stringify({code})
+  });
+  const data = await response.json();
+  showResult(data);
+  return data;
+}
+
+async function startScanner() {
+  if (scanner) return;
+  locked = false;
+  scanner = new Html5Qrcode("reader");
+  startButton.classList.add("d-none");
+  stopButton.classList.remove("d-none");
+  result.innerHTML = '<div class="alert alert-info">Aponte a câmera para o QR Code do bilhete.</div>';
+
+  await scanner.start(
+    {facingMode: "environment"},
+    {fps: 10, qrbox: {width: 260, height: 260}},
+    async decodedText => {
+      if (locked) return;
+      locked = true;
+      try {
+        await validateCode(decodedText);
+      } finally {
+        setTimeout(() => { locked = false; }, 3000);
+      }
+    },
+    () => {}
+  );
+}
+
+async function stopScanner() {
+  if (!scanner) return;
+  await scanner.stop();
+  scanner.clear();
+  scanner = null;
+  startButton.classList.remove("d-none");
+  stopButton.classList.add("d-none");
+}
+
+startButton.addEventListener("click", () => startScanner().catch(err => {
+  result.innerHTML = `<div class="alert alert-danger">Não foi possível iniciar a câmera: ${err}</div>`;
+}));
+stopButton.addEventListener("click", () => stopScanner());
+</script>
+{% endblock %}

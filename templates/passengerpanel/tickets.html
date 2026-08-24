@@ -1,0 +1,10 @@
+{% extends "passengerpanel/base.html" %}
+{% block passenger_content %}
+<h1 class="h3 mb-3">Meus bilhetes</h1>
+<div class="row g-3">{% for booking in bookings %}<div class="col-md-6"><div class="card border-0 shadow-sm"><div class="card-body">
+<div class="d-flex justify-content-between"><strong>{{ booking.trip.route.origin }} → {{ booking.trip.route.destination }}</strong><span class="badge {% if booking.status == 'paid' %}bg-success{% elif booking.status == 'pending' %}bg-warning text-dark{% else %}bg-secondary{% endif %}">{{ booking.get_status_display }}</span></div>
+<p class="mb-1">{{ booking.trip.departure_at|date:"d/m/Y H:i" }} · Lugar {{ booking.trip_seat.seat.seat_number }}</p>
+<p class="text-muted">{{ booking.trip.transporter.name }}</p>
+{% if booking.status == 'paid' %}<a class="btn btn-success" href="{% url 'passengerpanel:ticket-detail' booking.reference %}">Abrir bilhete e QR Code</a>{% elif booking.status == 'pending' %}<a class="btn btn-primary" href="{% url 'passengerpanel:payment' booking.reference %}">Continuar pagamento</a>{% endif %}
+</div></div></div>{% empty %}<div class="col-12"><div class="alert alert-info">Você ainda não possui bilhetes.</div></div>{% endfor %}</div>
+{% endblock %}

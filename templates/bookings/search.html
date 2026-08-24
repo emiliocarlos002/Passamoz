@@ -1,0 +1,40 @@
+{% extends "base.html" %}
+{% block title %}Pesquisar viagens — PassaMoz{% endblock %}
+{% block content %}
+<section class="page-header">
+  <span class="eyebrow">PESQUISAR VIAGEM</span>
+  <h1>Encontre a sua próxima viagem</h1>
+  <p>Compare horários, operadoras, preços e lugares disponíveis.</p>
+</section>
+
+<form method="get" class="search-panel search-panel-pro" data-no-loading="true">
+  <label><span>Origem</span><input name="origin" value="{{ origin }}" placeholder="Ex.: Maputo" autocomplete="address-level2"></label>
+  <label><span>Destino</span><input name="destination" value="{{ destination }}" placeholder="Ex.: Beira" autocomplete="address-level2"></label>
+  <label><span>Data</span><input type="date" name="date" value="{{ date }}"></label>
+  <button class="button button-green" type="submit">⌕ Pesquisar</button>
+</form>
+
+<div class="results-toolbar">
+  <strong>{{ trips|length }} viagem{% if trips|length != 1 %}ns{% endif %} encontrada{% if trips|length != 1 %}s{% endif %}</strong>
+  {% if origin or destination or date %}<a href="{% url 'trip-search' %}">Limpar filtros</a>{% endif %}
+</div>
+
+<div class="trip-results">
+{% for trip in trips %}
+<article class="trip-card trip-result-card">
+  <div class="trip-result-main">
+    <div class="trip-result-top"><span class="badge badge-blue">{{ trip.transporter.name }}</span><span class="availability-pill">{{ trip.available_count }} lugares livres</span></div>
+    <h2>{{ trip.route.origin }} <span>→</span> {{ trip.route.destination }}</h2>
+    <div class="trip-meta"><span>◷ {{ trip.departure_at|date:"d/m/Y H:i" }}</span><span>🚌 {{ trip.vehicle.name }}</span></div>
+    <div class="trip-seat-preview" aria-label="Lugares disponíveis">
+      {% for seat in trip.trip_seats.all %}{% if seat.is_available and forloop.counter <= 8 %}<i title="Lugar {{ seat.seat.seat_number }}"></i>{% endif %}{% endfor %}
+      {% if trip.available_count > 8 %}<small>+{{ trip.available_count|add:"-8" }} lugares</small>{% endif %}
+    </div>
+  </div>
+  <div class="trip-result-price"><small>por passageiro</small><strong>{{ trip.price }} {{ trip.currency }}</strong><a class="button button-green" href="{% url 'passengerpanel:trip-detail' trip.pk %}">Ver viagem <span>→</span></a></div>
+</article>
+{% empty %}
+<div class="empty-state"><div class="empty-icon">🚌</div><h2>Nenhuma viagem encontrada</h2><p>Tente outra origem, destino ou data. Também pode limpar os filtros e ver todas as viagens.</p><a class="button button-green" href="{% url 'trip-search' %}">Ver todas as viagens</a></div>
+{% endfor %}
+</div>
+{% endblock %}

@@ -1,0 +1,33 @@
+{% extends "base.html" %}
+{% block title %}Notificações | PassaMoz{% endblock %}
+{% block content %}
+<div class="container py-4">
+  <div class="d-flex justify-content-between align-items-center mb-4">
+    <div><h1 class="h3 mb-1">Notificações</h1><p class="text-muted mb-0">Acompanhe o estado dos seus pagamentos e bilhetes.</p></div>
+    <form method="post" action="{% url 'notifications:mark-all-read' %}" data-confirm="Marcar todas as notificações como lidas?">{% csrf_token %}<button type="submit" class="btn btn-outline-secondary">Marcar todas como lidas</button></form>
+  </div>
+  <div class="list-group shadow-sm">
+  {% for notification in notifications %}
+    <div class="list-group-item {% if not notification.is_read %}list-group-item-success{% endif %}">
+      <div class="d-flex justify-content-between gap-3">
+        <div>
+          <h2 class="h6 mb-1">{{ notification.title }}</h2>
+          <p class="mb-1">{{ notification.message }}</p>
+          <small class="text-muted">{{ notification.created_at|date:"d/m/Y H:i" }}</small>
+          {% if notification.booking and notification.kind == "payment_confirmed" %}
+            <a class="btn btn-sm btn-success ms-2" href="{% url 'passengerpanel:ticket-detail' notification.booking.reference %}">Abrir bilhete</a>
+          {% elif notification.booking and notification.kind == "payment_rejected" %}
+            <a class="btn btn-sm btn-outline-primary ms-2" href="{% url 'passengerpanel:my-tickets' %}">Ver reservas</a>
+          {% endif %}
+        </div>
+        {% if not notification.is_read %}
+        <form method="post" action="{% url 'notifications:mark-read' notification.pk %}">{% csrf_token %}<button type="submit" class="btn btn-sm btn-outline-success">Lida</button></form>
+        {% endif %}
+      </div>
+    </div>
+  {% empty %}
+    <div class="list-group-item text-center py-5 text-muted">Não há notificações.</div>
+  {% endfor %}
+  </div>
+</div>
+{% endblock %}

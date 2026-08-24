@@ -1,0 +1,9 @@
+{% extends "base.html" %}
+{% block title %}Definições da conta | PassaMoz{% endblock %}
+{% block content %}
+<div class="page-header"><span class="eyebrow">A MINHA CONTA</span><h1>Definições</h1><p>Atualize os seus dados e mantenha a conta segura.</p></div>
+<div class="settings-grid">
+  <div class="form-card"><h2>Dados pessoais</h2><form method="post">{% csrf_token %}{{ form.as_p }}<button class="button button-green" type="submit">Guardar alterações</button></form></div>
+  <div class="form-card settings-help"><h2>Segurança</h2><p>Quer trocar a palavra-passe?</p><a class="button button-light" href="{% url 'password_change' %}">Alterar palavra-passe</a><hr><h3>Recuperação</h3><p>Se esquecer a palavra-passe, use a opção <strong>Esqueci minha senha</strong> na página de entrada.</p></div>
+</div>
+{% endblock %}

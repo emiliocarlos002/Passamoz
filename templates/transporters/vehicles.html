@@ -1,0 +1,6 @@
+{% extends "base.html" %}
+{% block content %}
+<h1>Veículos</h1>
+<div class="form-card"><form method="post">{% csrf_token %}{{ form.as_p }}<button type="submit" class="button">Adicionar</button></form></div>
+{% for vehicle in vehicles %}<div class="card">{{ vehicle.name }} — {{ vehicle.capacity }} lugares</div>{% empty %}<p>Nenhum veículo.</p>{% endfor %}
+{% endblock %}

@@ -1,0 +1,19 @@
+{% extends "base.html" %}
+{% block title %}Mensalidades — PassaMoz{% endblock %}
+{% block content %}
+<section class="page-header"><span class="eyebrow">ADMINISTRAÇÃO</span><h1>Mensalidades das operadoras</h1><p>A PassaMoz não cobra comissão por bilhete.</p></section>
+{% for item in subscriptions %}
+<div class="card subscription-row">
+  <div><strong>{{ item.transporter.name }}</strong><br><small>{{ item.reference_month|date:"m/Y" }}</small></div>
+  <div><strong>{{ item.amount }} MZN</strong><br><small>Vencimento {{ item.due_date|date:"d/m/Y" }}</small></div>
+  <div><span class="badge">{{ item.get_status_display }}</span></div>
+  {% if item.status != "paid" %}
+  <form method="post" action="{% url 'platform-subscription-paid' item.pk %}" data-confirm="Marcar esta mensalidade como paga?">
+    {% csrf_token %}
+    <input name="payment_reference" placeholder="Referência">
+    <button type="submit" class="button button-green">Marcar paga</button>
+  </form>
+  {% endif %}
+</div>
+{% empty %}<div class="empty-state"><h2>Nenhuma mensalidade</h2></div>{% endfor %}
+{% endblock %}

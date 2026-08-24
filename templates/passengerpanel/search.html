@@ -1,0 +1,21 @@
+{% extends "passengerpanel/base.html" %}
+{% block passenger_content %}
+<h1 class="h3 mb-3">Pesquisar viagens</h1>
+<form method="get" action="{% url 'passengerpanel:search' %}" class="card border-0 shadow-sm p-3 mb-4">
+<div class="row g-2">
+<div class="col-md-4"><label class="form-label">Origem</label><input name="origin" value="{{ origin }}" class="form-control" placeholder="Maputo"></div>
+<div class="col-md-4"><label class="form-label">Destino</label><input name="destination" value="{{ destination }}" class="form-control" placeholder="Xai-Xai"></div>
+<div class="col-md-2"><label class="form-label">Data</label><input type="date" name="date" value="{{ date }}" class="form-control"></div>
+<div class="col-md-2 d-flex align-items-end"><button type="submit" class="btn btn-success w-100">Pesquisar</button></div>
+</div></form>
+<div class="row g-3">
+{% for trip in trips %}<div class="col-md-6 col-xl-4"><div class="card border-0 shadow-sm h-100"><div class="card-body">
+<span class="badge bg-success mb-2">{{ trip.transporter.name }}</span>
+<h2 class="h5">{{ trip.route.origin }} → {{ trip.route.destination }}</h2>
+<p class="mb-1">{{ trip.departure_at|date:"d/m/Y H:i" }}</p>
+<p class="text-muted">{{ trip.vehicle.name }} · {{ trip.available_count }} lugares</p>
+<div class="d-flex justify-content-between align-items-center"><strong>{{ trip.price }} {{ trip.currency }}</strong><a href="{% url 'passengerpanel:trip-detail' trip.pk %}" class="btn btn-primary">Ver viagem</a></div>
+</div></div></div>
+{% empty %}<div class="col-12"><div class="alert alert-info">Nenhuma viagem encontrada.</div></div>{% endfor %}
+</div>
+{% endblock %}
