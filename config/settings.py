@@ -7,7 +7,7 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 
 SECRET_KEY = os.getenv("SECRET_KEY", "dev-only-change-this-key")
 DEBUG = os.getenv("DEBUG", "False").lower() == "true"
-ALLOWED_HOSTS = [h.strip() for h in os.getenv("ALLOWED_HOSTS", "localhost,127.0.0.1").split(",") if h.strip()]
+ALLOWED_HOSTS = ["passamoz-web.onrender.com"]
 
 INSTALLED_APPS = [
     "django.contrib.admin",
@@ -142,9 +142,7 @@ SECURE_HSTS_SECONDS = int(os.getenv("SECURE_HSTS_SECONDS", "0"))
 SECURE_HSTS_INCLUDE_SUBDOMAINS = os.getenv("SECURE_HSTS_INCLUDE_SUBDOMAINS", "False").lower() == "true"
 SECURE_HSTS_PRELOAD = os.getenv("SECURE_HSTS_PRELOAD", "False").lower() == "true"
 X_FRAME_OPTIONS = "DENY"
-CSRF_TRUSTED_ORIGINS = [
-    x.strip() for x in os.getenv("CSRF_TRUSTED_ORIGINS", "").split(",") if x.strip()
-]
+CSRF_TRUSTED_ORIGINS = ["https://passamoz-web.onrender.com"]
 
 # Optional Redis cache
 REDIS_URL = os.getenv("REDIS_URL", "").strip()
