@@ -7,10 +7,7 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 
 SECRET_KEY = os.getenv("SECRET_KEY", "dev-only-change-this-key")
 DEBUG = os.getenv("DEBUG", "False").lower() == "true"
-
-ALLOWED_HOSTS = ["*"]
-
-CSRF_TRUSTED_ORIGINS = [ "https://passamoz.onrender.com", ]
+ALLOWED_HOSTS = [h.strip() for h in os.getenv("ALLOWED_HOSTS", "localhost,127.0.0.1").split(",") if h.strip()]
 
 INSTALLED_APPS = [
     "django.contrib.admin",
@@ -106,17 +103,26 @@ else:
     }
 
 # E-mail / recuperação de conta.
-# Em desenvolvimento, se SMTP não estiver configurado, o link aparece no terminal.
+# Produção no Render: Brevo via HTTPS API (não usa as portas SMTP bloqueadas no Free).
+BREVO_API_KEY = os.getenv("BREVO_API_KEY", "").strip()
+BREVO_SENDER_EMAIL = os.getenv("BREVO_SENDER_EMAIL", "").strip()
+BREVO_SENDER_NAME = os.getenv("BREVO_SENDER_NAME", "PassaMoz").strip()
+DEFAULT_FROM_EMAIL = os.getenv("DEFAULT_FROM_EMAIL", "PassaMoz <no-reply@passamoz.local>")
+PASSAMOZ_ADMIN_EMAIL = os.getenv("PASSAMOZ_ADMIN_EMAIL", "")
+PASSAMOZ_ACTIVATION_TIMEOUT_HOURS = int(os.getenv("PASSAMOZ_ACTIVATION_TIMEOUT_HOURS", "24"))
+EMAIL_TIMEOUT = int(os.getenv("EMAIL_TIMEOUT", "20"))
+
+# Mantidos para compatibilidade com instalações antigas, mas não são usados quando
+# BREVO_API_KEY está configurada. Sem Brevo, o desenvolvimento local usa console.
 EMAIL_HOST = os.getenv("EMAIL_HOST", "")
 EMAIL_PORT = int(os.getenv("EMAIL_PORT", "587"))
 EMAIL_HOST_USER = os.getenv("EMAIL_HOST_USER", "")
 EMAIL_HOST_PASSWORD = os.getenv("EMAIL_HOST_PASSWORD", "")
 EMAIL_USE_TLS = os.getenv("EMAIL_USE_TLS", "True").lower() == "true"
-DEFAULT_FROM_EMAIL = os.getenv("DEFAULT_FROM_EMAIL", "PassaMoz <no-reply@passamoz.local>")
-PASSAMOZ_ADMIN_EMAIL = os.getenv("PASSAMOZ_ADMIN_EMAIL", "")
-PASSAMOZ_ACTIVATION_TIMEOUT_HOURS = int(os.getenv("PASSAMOZ_ACTIVATION_TIMEOUT_HOURS", "24"))
-EMAIL_TIMEOUT = int(os.getenv("EMAIL_TIMEOUT", "20"))
-if EMAIL_HOST and EMAIL_HOST_USER and EMAIL_HOST_PASSWORD:
+
+if BREVO_API_KEY:
+    EMAIL_BACKEND = "apps.core.email.backends.BrevoEmailBackend"
+elif EMAIL_HOST and EMAIL_HOST_USER and EMAIL_HOST_PASSWORD:
     EMAIL_BACKEND = "django.core.mail.backends.smtp.EmailBackend"
 else:
     EMAIL_BACKEND = "django.core.mail.backends.console.EmailBackend"
